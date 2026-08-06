@@ -1,22 +1,34 @@
 <main class="onboarding">
   <h1>Set up your subscription</h1>
 
+  <%# Wrap the onboarding flow in a Turbo Frame so only the form updates between steps. %>
   <%= turbo_frame_tag "onboarding_step" do %>
+
+    <%# Display a success screen once onboarding has completed. %>
     <% if @submission_complete %>
       <section class="card confirmation-success" aria-live="polite">
         <h2>You may pay on arrival 😉</h2>
         <p>Your request has been saved.</p>
 
+        <%# Show a link to the user's assigned asteroid if one exists. %>
         <% if @saved_asteroid.present? %>
           <p>Here is your asteroid:</p>
-          <%= link_to "View asteroid", asteroid_path(@saved_asteroid), class: "button primary" %>
+          <%= link_to "View asteroid", asteroid_path(@saved_asteroid),
+            class: "button primary",
+            data: { turbo_frame: "_top" } %>
         <% end %>
 
         <div class="form-actions">
-          <%= link_to "Return home", root_path, class: "button secondary" %>
+          <%= link_to "Return home", root_path,
+              class: "button secondary",
+              data: { turbo_frame: "_top" } %>
         </div>
       </section>
+
+    <%# Otherwise render the current onboarding step. %>
     <% else %>
+
+      <%# Progress indicator showing the user's current step. %>
       <nav aria-label="Onboarding progress">
         <ol>
           <li class="<%= "current" if @step == "account" %>">
@@ -33,20 +45,24 @@
         </ol>
       </nav>
 
+      <%# Display any validation errors returned by the wizard. %>
       <% if @error.present? %>
         <p class="form-error" role="alert">
           <%= @error %>
         </p>
       <% end %>
 
+      <%# Submit back to the current onboarding step. %>
       <%= form_with url: onboarding_path(step: @step),
                     method: :patch,
                     autocomplete: "on" do |form| %>
 
+        <%# -------------------- Account Step -------------------- %>
         <% if @step == "account" %>
           <fieldset>
             <legend>Tell us about yourself</legend>
 
+            <%# User's name. %>
             <div class="form-field">
               <%= form.label :name, "Your name" %>
 
@@ -60,6 +76,7 @@
               <small>Example: Alex Morgan</small>
             </div>
 
+            <%# User's email address. %>
             <div class="form-field">
               <%= form.label :email, "Email address" %>
 
@@ -72,6 +89,7 @@
               <small>Example: alex@example.com</small>
             </div>
 
+            <%# Shipping address for the subscription. %>
             <div class="form-field">
               <%= form.label :address, "Shipping address" %>
 
@@ -87,6 +105,7 @@
               </small>
             </div>
 
+            <%# Account password. %>
             <div class="form-field">
               <%= form.label :password, "Password" %>
               <%= form.password_field :password,
@@ -95,6 +114,7 @@
                                       autocomplete: "new-password" %>
             </div>
 
+            <%# Password confirmation to prevent typing mistakes. %>
             <div class="form-field">
               <%= form.label :password_confirmation, "Confirm password" %>
               <%= form.password_field :password_confirmation,
@@ -107,10 +127,12 @@
 
           <%= form.submit "Continue to plans" %>
 
+        <%# -------------------- Plan Step -------------------- %>
         <% elsif @step == "plan" %>
           <fieldset class="plan-grid">
             <legend>Choose a plan</legend>
 
+            <%# Render every available subscription plan. %>
             <% @plans.each do |plan| %>
               <label class="plan-option">
                 <%= form.radio_button :plan_id,
@@ -127,11 +149,17 @@
             <%= form.submit "Review subscription", class: "button primary" %>
           </div>
 
+        <%# -------------------- Confirmation Step -------------------- %>
         <% elsif @step == "confirm" %>
+
+          <%# Retrieve the selected plan and assigned asteroid. %>
           <% selected_plan = @plans.find { |plan| plan.id.to_s == @draft["plan_id"].to_s } %>
           <% asteroid = @selected_asteroid %>
+
+          <%# Convert MOID from lunar distances to kilometres for display. %>
           <% moid_km = asteroid&.moid_ld.to_f * 384_400 %>
 
+          <%# Show a summary of the randomly assigned asteroid. %>
           <% if asteroid %>
             <section class="asteroid-summary card">
               <p class="eyebrow">Asteroid</p>
@@ -181,6 +209,7 @@
             </section>
           <% end %>
 
+          <%# Display a final summary before creating the account. %>
           <section class="confirmation-summary card">
             <h2>Review your subscription</h2>
 
@@ -206,6 +235,8 @@
                   <% if selected_plan %>
                     <strong><%= selected_plan.name %></strong>
                     <div>$<%= number_with_precision(selected_plan.price, precision: 0) %>/month</div>
+
+                    <%# Display the asteroid diameter range covered by the plan. %>
                     <div>
                       <% if selected_plan.min_diameter.zero? %>
                         Less than <%= selected_plan.max_diameter %> km
