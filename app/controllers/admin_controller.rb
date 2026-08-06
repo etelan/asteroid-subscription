@@ -27,7 +27,7 @@ class AdminController < ApplicationController
 
   def logout
     session.delete(:admin_user_id)
-    redirect_to admin_login_path, notice: "Signed out"
+    redirect_to root_path, notice: "Signed out"
   end
 
   private
