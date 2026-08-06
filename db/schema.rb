@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_06_123137) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_06_131619) do
   create_table "asteroids", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.float "diameter"
@@ -45,10 +45,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_06_123137) do
     t.string "email"
     t.boolean "is_admin", default: false
     t.string "name", null: false
+    t.string "password_digest"
     t.integer "plan_id"
     t.date "plan_start_date"
     t.integer "upcoming_asteroid_id"
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["password_digest"], name: "index_users_on_password_digest"
     t.index ["plan_id"], name: "index_users_on_plan_id"
     t.index ["upcoming_asteroid_id"], name: "index_users_on_upcoming_asteroid_id"
   end

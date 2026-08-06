@@ -1,0 +1,81 @@
+<main class="admin-dashboard">
+  <header class="admin-header">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Dashboard</h1>
+    </div>
+
+    <%= button_to "Sign out", admin_logout_path,
+                  method: :delete,
+                  class: "button secondary" %>
+  </header>
+
+  <section class="admin-summary">
+    <div class="card">
+      <p>Total users</p>
+      <strong><%= User.count %></strong>
+    </div>
+
+    <div class="card">
+      <p>Total asteroids</p>
+      <strong><%= Asteroid.count %></strong>
+    </div>
+
+    <div class="card">
+      <p>Total plans</p>
+      <strong><%= Plan.count %></strong>
+    </div>
+  </section>
+
+  <section class="admin-users">
+    <h2>Users</h2>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Plan</th>
+          <th>Upcoming asteroid</th>
+          <th>Admin</th>
+          <th>Signed up</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td>
+              <% if user.plan %>
+                <%= link_to user.plan.name, plan_path(user.plan) %>
+              <% end %>
+            </td>
+            <td>
+              <% if user.upcoming_asteroid %>
+                <%= link_to user.upcoming_asteroid.full_name, asteroid_path(user.upcoming_asteroid) %>
+              <% end %>
+            </td>
+            <td><%= user.is_admin? ? "yes" : "no" %></td>
+            <td><%= user.created_at.to_date %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="admin-plans">
+    <h2>Plans</h2>
+
+    <ul class="plan-list">
+      <% @plans.each do |plan| %>
+        <li>
+          <%= link_to plan_path(plan) do %>
+            <strong><%= plan.name %></strong>
+            <span><%= plan.min_diameter %> km – <%= plan.max_diameter %> km</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+</main>

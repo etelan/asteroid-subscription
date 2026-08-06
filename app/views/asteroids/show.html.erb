@@ -1,0 +1,41 @@
+<main class="detail-page">
+  <%= link_to "← Back", request.referer || root_path, class: "link-muted" %>
+
+  <section class="card detail-card">
+    <p class="eyebrow">Asteroid</p>
+    <h1><%= @asteroid.full_name %></h1>
+    <p class="muted"><%= @asteroid.spkid %> · <%= @asteroid.kind %></p>
+
+    <dl class="detail-grid">
+      <div>
+        <dt>Width</dt>
+        <dd><%= number_with_precision(@asteroid.diameter, precision: 3) %> km</dd>
+      </div>
+
+      <div>
+        <dt>Uncertainty estimate</dt>
+        <dd><%= number_with_precision(@asteroid.diameter_sigma, precision: 3) %> km</dd>
+      </div>
+
+      <div>
+        <dt>MOID</dt>
+        <dd><%= number_with_precision(@asteroid.moid_ld, precision: 1) %> LD</dd>
+      </div>
+
+      <div>
+        <dt>First observation</dt>
+        <dd><%= @asteroid.first_obs&.to_date&.strftime("%B %-d, %Y") %></dd>
+      </div>
+
+      <div>
+        <dt>Last observation</dt>
+        <dd><%= @asteroid.last_obs&.to_date&.strftime("%B %-d, %Y") %></dd>
+      </div>
+
+      <div>
+        <dt>Assigned user</dt>
+        <dd><%= @asteroid.user&.email || "None" %></dd>
+      </div>
+    </dl>
+  </section>
+</main>

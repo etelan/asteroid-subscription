@@ -71,6 +71,20 @@
               Example: 123 Example Street, London SW1A 1AA
             </small>
           </div>
+
+          <div class="form-field">
+            <%= form.label :password, "Password" %>
+            <%= form.password_field :password,
+                                   required: true,
+                                   autocomplete: "new-password" %>
+          </div>
+
+          <div class="form-field">
+            <%= form.label :password_confirmation, "Confirm password" %>
+            <%= form.password_field :password_confirmation,
+                                   required: true,
+                                   autocomplete: "new-password" %>
+          </div>
         </fieldset>
 
         <%= form.submit "Continue to plans" %>

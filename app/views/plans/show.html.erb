@@ -1,0 +1,30 @@
+<main class="detail-page">
+  <%= link_to "← Back", request.referer || root_path, class: "link-muted" %>
+
+  <section class="card detail-card">
+    <p class="eyebrow">Plan</p>
+    <h1><%= @plan.name %></h1>
+
+    <dl class="detail-grid">
+      <div>
+        <dt>Price</dt>
+        <dd>$<%= number_with_precision(@plan.price, precision: 0) %>/month</dd>
+      </div>
+
+      <div>
+        <dt>Diameter range</dt>
+        <dd><%= @plan.min_diameter %> km – <%= @plan.max_diameter %> km</dd>
+      </div>
+
+      <div>
+        <dt>Asteroids matching</dt>
+        <dd><%= @asteroid_count %></dd>
+      </div>
+
+      <div class="plan-description">
+        <dt>Description</dt>
+        <dd><%= simple_format(@plan.description.presence || "No description available.") %></dd>
+      </div>
+    </dl>
+  </section>
+</main>

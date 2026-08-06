@@ -1,0 +1,21 @@
+<main class="admin-login">
+  <h1>Admin login</h1>
+
+  <% if flash[:alert] %>
+    <p class="flash alert"><%= flash[:alert] %></p>
+  <% end %>
+
+  <%= form_with url: admin_authenticate_path, method: :post, local: true do |form| %>
+    <div class="form-field">
+      <%= form.label :email, "Admin email" %>
+      <%= form.email_field :email, required: true, autofocus: true %>
+    </div>
+
+    <div class="form-field">
+      <%= form.label :password, "Password" %>
+      <%= form.password_field :password, required: true, autocomplete: "current-password" %>
+    </div>
+
+    <%= form.submit "Sign in", class: "button primary" %>
+  <% end %>
+</main>

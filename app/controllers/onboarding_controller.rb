@@ -37,6 +37,8 @@ class OnboardingController < ApplicationController
         name: @draft["name"],
         email: @draft["email"],
         address: @draft["address"],
+        password: @draft["password"],
+        password_confirmation: @draft["password_confirmation"],
         plan: @selected_plan,
         plan_start_date: Date.current,
         upcoming_asteroid: @selected_asteroid
@@ -73,7 +75,13 @@ class OnboardingController < ApplicationController
   end
 
   def submitted_attributes
-    params.permit(:name, :email, :address, :plan_id, :step).to_h
+    params.permit(:name,
+                  :email,
+                  :address,
+                  :plan_id,
+                  :password,
+                  :password_confirmation,
+                  :step).to_h
   end
 
   def load_plans
