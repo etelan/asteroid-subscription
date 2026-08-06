@@ -5,7 +5,7 @@ class OnboardingWizardTest < ActiveSupport::TestCase
     plan = Plan.create!(name: "Test Plan", price: 10.0, min_diameter: 0.1, max_diameter: 1.0)
     wizard = OnboardingWizard.new(session: {}, params: ActionController::Parameters.new(step: "plan"))
 
-    assert_equal [plan], wizard.plans
+    assert_equal [ plan ], wizard.plans
     assert_equal "plan", wizard.step
   end
 
