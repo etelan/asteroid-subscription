@@ -1,14 +1,16 @@
 <div class="plan-card">
-  <h3><%= plan.name %></h3>
+  <div class="plan-card__header">
+    <strong class="plan-card__title"><%= plan.name %></strong>
+    <span class="plan-card__price">$<%= number_with_precision(plan.price, precision: 0) %>/month</span>
+  </div>
 
-  <h4>
+  <p class="plan-card__range">
     <% if plan.min_diameter.zero? %>
       Less than <%= plan.max_diameter %>km in diameter
     <% else %>
-      <%= plan.min_diameter %>km - <%= plan.max_diameter %>km in diameter
+      <%= plan.min_diameter %>km – <%= plan.max_diameter %>km in diameter
     <% end %>
-  </h4>
+  </p>
 
-  <p><%= plan.description %></p>
-  <p>$<%= number_with_precision(plan.price, precision: 2) %> per month</p>
+  <p class="plan-card__description"><%= plan.description %></p>
 </div>

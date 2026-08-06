@@ -26,6 +26,12 @@ class OnboardingController < ApplicationController
     end
 
     if @step == "plan"
+      unless @draft["plan_id"].present?
+        @error = "Please select a plan first."
+        render :show, status: :unprocessable_entity
+        return
+      end
+
       @draft.delete("asteroid_id")
       session[:onboarding] = @draft
       redirect_to onboarding_path(step: "confirm")
@@ -33,12 +39,6 @@ class OnboardingController < ApplicationController
     end
 
     if @step == "confirm"
-      unless @selected_plan
-        @error = "Please select a plan first."
-        render :show, status: :unprocessable_entity
-        return
-      end
-
       unless @selected_asteroid
         @error = "No asteroid available for this plan."
         render :show, status: :unprocessable_entity

@@ -102,22 +102,7 @@
                                     plan.id,
                                     checked: @draft["plan_id"].to_s == plan.id.to_s %>
 
-              <div class="plan-card">
-                <div class="plan-card__header">
-                  <strong class="plan-card__title"><%= plan.name %></strong>
-                  <span class="plan-card__price">$<%= number_with_precision(plan.price, precision: 0) %>/month</span>
-                </div>
-
-                <p class="plan-card__range">
-                  <% if plan.min_diameter.zero? %>
-                    Less than <%= plan.max_diameter %>km in diameter
-                  <% else %>
-                    <%= plan.min_diameter %>km – <%= plan.max_diameter %>km in diameter
-                  <% end %>
-                </p>
-
-                <p class="plan-card__description"><%= plan.description %></p>
-              </div>
+              <%= render partial: "plans/card", locals: { plan: plan } %>
             </label>
           <% end %>
         </fieldset>
