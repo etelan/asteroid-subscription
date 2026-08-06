@@ -35,10 +35,14 @@
         <tr>
           <th>Name</th>
           <th>Email</th>
+          <th>Address</th>
           <th>Plan</th>
+          <th>Plan start</th>
           <th>Upcoming asteroid</th>
+          <th>User id</th>
           <th>Admin</th>
-          <th>Signed up</th>
+          <th>Created</th>
+          <th>Updated</th>
         </tr>
       </thead>
       <tbody>
@@ -46,18 +50,23 @@
           <tr>
             <td><%= user.name %></td>
             <td><%= user.email %></td>
+            <td><%= user.address %></td>
             <td>
               <% if user.plan %>
                 <%= link_to user.plan.name, plan_path(user.plan) %>
               <% end %>
             </td>
+            <td><%= user.plan_start_date %></td>
             <td>
               <% if user.upcoming_asteroid %>
                 <%= link_to user.upcoming_asteroid.full_name, asteroid_path(user.upcoming_asteroid) %>
+                (<%= user.upcoming_asteroid.id %>)
               <% end %>
             </td>
+            <td><%= user.id %></td>
             <td><%= user.is_admin? ? "yes" : "no" %></td>
             <td><%= user.created_at.to_date %></td>
+            <td><%= user.updated_at.to_date %></td>
           </tr>
         <% end %>
       </tbody>
@@ -67,15 +76,33 @@
   <section class="admin-plans">
     <h2>Plans</h2>
 
-    <ul class="plan-list">
-      <% @plans.each do |plan| %>
-        <li>
-          <%= link_to plan_path(plan) do %>
-            <strong><%= plan.name %></strong>
-            <span><%= plan.min_diameter %> km – <%= plan.max_diameter %> km</span>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Range</th>
+          <th>Asteroids</th>
+          <th>ID</th>
+          <th>Created</th>
+          <th>Updated</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @plans.each do |plan| %>
+          <tr>
+            <td><%= link_to plan.name, plan_path(plan) %></td>
+            <td>$<%= number_with_precision(plan.price, precision: 0) %>/month</td>
+            <td><%= plan.min_diameter %> km – <%= plan.max_diameter %> km</td>
+            <td><%= Asteroid.where(diameter: plan.min_diameter..plan.max_diameter).count %></td>
+            <td><%= plan.id %></td>
+            <td><%= plan.created_at.to_date %></td>
+            <td><%= plan.updated_at.to_date %></td>
+            <td><%= plan.description.presence || "No description available." %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   </section>
 </main>
