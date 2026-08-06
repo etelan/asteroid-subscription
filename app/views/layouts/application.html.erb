@@ -17,10 +17,7 @@
       <header class="site-header">
         <%= link_to "ACME", root_path, class: "brand" %>
 
-        <nav>
-          <%= link_to "Plans", root_path(anchor: "plans") %>
-          <%= link_to "Get started", onboarding_path(step: "account") %>
-        </nav>
+        <%= render "shared/navbar" %>
       </header>
 
       <main class="site-content">

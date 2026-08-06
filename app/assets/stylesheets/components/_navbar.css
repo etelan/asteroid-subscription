@@ -1,0 +1,21 @@
+.site-header nav {
+  display: flex;
+  gap: 24px;
+}
+
+.site-header nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.site-header nav a:hover {
+  color: var(--cyan);
+}
+
+@media (max-width: 650px) {
+  .site-header nav {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+}
