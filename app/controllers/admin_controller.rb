@@ -1,5 +1,6 @@
 class AdminController < ApplicationController
-  before_action :require_admin!, only: %i[dashboard logout asteroid plan]
+  before_action :require_admin!, only: %i[dashboard logout]
+  layout "admin"
 
   def login
   end
@@ -22,15 +23,6 @@ class AdminController < ApplicationController
   def dashboard
     @users = User.includes(:plan, :upcoming_asteroid).order(created_at: :desc)
     @plans = Plan.order(:min_diameter)
-  end
-
-  def asteroid
-    @asteroid = Asteroid.find(params[:id])
-  end
-
-  def plan
-    @plan = Plan.find(params[:id])
-    @asteroid_count = Asteroid.where(diameter: @plan.min_diameter..@plan.max_diameter).count
   end
 
   def logout
