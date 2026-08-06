@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
   def index
-    @plans = Plan.order(:min_diameter)
+    @plans = Plan.ordered_by_min_diameter
   end
 end
