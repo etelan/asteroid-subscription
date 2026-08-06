@@ -1,0 +1,523 @@
+/*
+  ACME UI
+  ----------
+  Sections:
+  1. Theme
+  2. Reset
+  3. Space background
+  4. Header
+  5. Homepage
+  6. Onboarding
+  7. Responsive rules
+  8. Reduced motion
+*/
+
+
+/* =========================================================
+   1. Theme
+   ========================================================= */
+
+:root {
+  --background: #050713;
+  --panel: rgba(8, 12, 28, 0.82);
+
+  --text: #f4f7ff;
+  --muted: #9da8c1;
+  --line: rgba(244, 247, 255, 0.2);
+
+  --cyan: #72f1e8;
+  --pink: #ff7ac8;
+}
+
+
+/* =========================================================
+   2. Reset
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--background);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+
+/* =========================================================
+   3. Space background
+   ========================================================= */
+
+.space-shell {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 35%, #12183a, var(--background) 65%);
+}
+
+.asteroid-field,
+.space-noise {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.asteroid-field {
+  z-index: -2;
+  opacity: 0.7;
+}
+
+.asteroid-field path {
+  fill: none;
+  stroke: rgba(218, 226, 255, 0.72);
+  stroke-width: 2;
+  stroke-linejoin: bevel;
+}
+
+.asteroid-field .inner-line {
+  stroke: rgba(143, 156, 210, 0.38);
+  stroke-width: 1.3;
+}
+
+/* Subtle old-screen scan lines. */
+.space-noise {
+  z-index: -1;
+  opacity: 0.08;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.18) 0,
+    rgba(255, 255, 255, 0.18) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+/* Each asteroid moves slowly and independently. */
+.asteroid-one {
+  animation: drift-one 28s ease-in-out infinite alternate;
+}
+
+.asteroid-two {
+  animation: drift-two 36s ease-in-out infinite alternate;
+}
+
+.asteroid-three {
+  animation: drift-three 42s ease-in-out infinite alternate;
+}
+
+.asteroid-four {
+  animation: drift-four 31s ease-in-out infinite alternate;
+}
+
+.asteroid-five {
+  animation: drift-five 24s ease-in-out infinite alternate;
+}
+
+.asteroid-six {
+  animation: drift-six 39s ease-in-out infinite alternate;
+}
+
+@keyframes drift-one {
+  to {
+    transform: translate(42px, 28px) rotate(12deg);
+  }
+}
+
+@keyframes drift-two {
+  to {
+    transform: translate(-35px, 46px) rotate(-15deg);
+  }
+}
+
+@keyframes drift-three {
+  to {
+    transform: translate(-52px, -25px) rotate(10deg);
+  }
+}
+
+@keyframes drift-four {
+  to {
+    transform: translate(38px, -35px) rotate(-18deg);
+  }
+}
+
+@keyframes drift-five {
+  to {
+    transform: translate(-28px, 32px) rotate(22deg);
+  }
+}
+
+@keyframes drift-six {
+  to {
+    transform: translate(25px, -30px) rotate(-12deg);
+  }
+}
+
+
+/* =========================================================
+   4. Header
+   ========================================================= */
+
+.site-header,
+.site-content {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0;
+}
+
+.brand {
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-decoration: none;
+}
+
+.site-header nav {
+  display: flex;
+  gap: 24px;
+}
+
+.site-header nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.site-header nav a:hover {
+  color: var(--cyan);
+}
+
+
+/* =========================================================
+   5. Homepage
+   ========================================================= */
+
+.hero {
+  max-width: 760px;
+  padding: 15vh 0 18vh;
+}
+
+.eyebrow {
+  color: var(--cyan);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 720px;
+  margin: 18px 0;
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 0.92;
+  letter-spacing: -0.08em;
+}
+
+.hero p:not(.eyebrow) {
+  max-width: 520px;
+  color: var(--muted);
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+.button,
+input[type="submit"] {
+  display: inline-block;
+  border: 1px solid var(--cyan);
+  border-radius: 999px;
+  padding: 13px 20px;
+  color: #071016;
+  background: var(--cyan);
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 0 28px rgba(114, 241, 232, 0.18);
+}
+
+.button:hover,
+input[type="submit"]:hover {
+  background: #b5fff8;
+}
+
+#plans {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  padding-bottom: 80px;
+}
+
+#plans h2 {
+  grid-column: 1 / -1;
+}
+
+#plans article {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+}
+
+#plans p {
+  color: var(--muted);
+}
+
+
+/* =========================================================
+   6. Onboarding
+   ========================================================= */
+
+.onboarding {
+  width: min(680px, 100%);
+  margin: 8vh auto;
+  padding: clamp(24px, 5vw, 54px);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+}
+
+.onboarding h1 {
+  margin-top: 0;
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: -0.06em;
+}
+
+.onboarding ol {
+  display: flex;
+  gap: 10px;
+  padding: 0;
+  margin: 0 0 42px;
+  list-style: none;
+}
+
+.onboarding li {
+  color: #65708c;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.onboarding li:not(:last-child)::after {
+  content: "/";
+  margin-left: 10px;
+  color: #414b68;
+}
+
+.onboarding li.current {
+  color: var(--cyan);
+}
+
+.onboarding fieldset {
+  padding: 0;
+  margin: 0 0 28px;
+  border: 0;
+}
+
+.onboarding legend {
+  margin-bottom: 24px;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.onboarding label {
+  display: block;
+  margin: 16px 0 8px;
+  color: var(--muted);
+}
+
+.onboarding input[type="text"],
+.onboarding input[type="email"],
+.onboarding textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.onboarding input:focus {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+.onboarding a {
+  margin-right: 18px;
+  color: var(--pink);
+}
+
+.flash {
+  color: var(--cyan);
+}
+
+.onboarding .plan-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.onboarding .plan-option {
+  display: block;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1.35rem 1.5rem 1.5rem 3.5rem;
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+
+.onboarding .plan-option:hover {
+  border-color: rgba(114, 241, 232, 0.7);
+  transform: translateY(-1px);
+}
+
+.onboarding .plan-option input[type="radio"] {
+  position: absolute;
+  top: 1.35rem;
+  left: 1.3rem;
+  accent-color: var(--cyan);
+}
+
+.onboarding .plan-card {
+  margin-left: 1rem;
+}
+
+.onboarding .plan-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.onboarding .plan-card__title {
+  font-size: 1.03rem;
+  line-height: 1.2;
+}
+
+.onboarding .plan-card__price {
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+.onboarding .plan-card__range,
+.onboarding .plan-card__description {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 0.96rem;
+}
+
+.onboarding .plan-card__description {
+  color: #c9d6ff;
+}
+
+.onboarding .confirmation-summary {
+  margin-top: 32px;
+}
+
+.onboarding .confirmation {
+  display: grid;
+  gap: 18px;
+  margin: 24px 0;
+}
+
+.onboarding .confirmation div {
+  display: grid;
+  gap: 6px;
+}
+
+.onboarding .confirmation dt {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.onboarding .confirmation dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.onboarding .form-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 26px;
+}
+
+.onboarding .button.secondary {
+  border-color: rgba(255, 122, 200, 0.35);
+  background: transparent;
+  color: var(--pink);
+  box-shadow: none;
+}
+
+.onboarding .button.secondary:hover {
+  background: rgba(255, 122, 200, 0.08);
+}
+
+
+/* =========================================================
+   7. Responsive rules
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .site-header {
+    align-items: flex-start;
+  }
+
+  .site-header nav {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  #plans {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding .plan-option {
+    padding-left: 2.6rem;
+  }
+}
+
+
+/* =========================================================
+   8. Accessibility
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .asteroid {
+    animation: none;
+  }
+}

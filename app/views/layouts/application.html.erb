@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Acme</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <div class="space-shell">
+      <%= render "shared/asteroid_field" %>
+
+      <div class="space-noise" aria-hidden="true"></div>
+
+      <header class="site-header">
+        <%= link_to "ACME", root_path, class: "brand" %>
+
+        <nav>
+          <%= link_to "Plans", root_path(anchor: "plans") %>
+          <%= link_to "Get started", onboarding_path(step: "account") %>
+        </nav>
+      </header>
+
+      <main class="site-content">
+        <% if notice.present? %>
+          <p class="flash" role="status"><%= notice %></p>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

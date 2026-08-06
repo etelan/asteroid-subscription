@@ -1,0 +1,164 @@
+<main class="onboarding">
+  <h1>Set up your subscription</h1>
+
+  <%= turbo_frame_tag "onboarding_step" do %>
+    <nav aria-label="Onboarding progress">
+      <ol>
+        <li class="<%= "current" if @step == "account" %>">
+          1. Account
+        </li>
+
+        <li class="<%= "current" if @step == "plan" %>">
+          2. Plan
+        </li>
+
+        <li class="<%= "current" if @step == "confirm" %>">
+          3. Confirm
+        </li>
+      </ol>
+    </nav>
+
+    <% if @error.present? %>
+      <p class="form-error" role="alert">
+        <%= @error %>
+      </p>
+    <% end %>
+
+    <%= form_with url: onboarding_path(step: @step),
+                  method: :patch,
+                  autocomplete: "on" do |form| %>
+
+      <% if @step == "account" %>
+        <fieldset>
+          <legend>Tell us about yourself</legend>
+
+          <div class="form-field">
+            <%= form.label :name, "Your name" %>
+
+            <%= form.text_field :name,
+                                value: @draft["name"],
+                                placeholder: "Alex Morgan",
+                                autocomplete: "name",
+                                required: true,
+                                autofocus: true %>
+
+            <small>Example: Alex Morgan</small>
+          </div>
+
+          <div class="form-field">
+            <%= form.label :email, "Email address" %>
+
+            <%= form.email_field :email,
+                                 value: @draft["email"],
+                                 placeholder: "alex@example.com",
+                                 autocomplete: "email",
+                                 required: true %>
+
+            <small>Example: alex@example.com</small>
+          </div>
+
+          <div class="form-field">
+            <%= form.label :address, "Shipping address" %>
+
+            <%= form.text_area :address,
+                               value: @draft["address"],
+                               placeholder: "123 Example Street&#10;London SW1A 1AA",
+                               autocomplete: "shipping street-address",
+                               rows: 2,
+                               required: true %>
+
+            <small>
+              Example: 123 Example Street, London SW1A 1AA
+            </small>
+          </div>
+        </fieldset>
+
+        <%= form.submit "Continue to plans" %>
+
+      <% elsif @step == "plan" %>
+        <fieldset class="plan-grid">
+          <legend>Choose a plan</legend>
+
+          <% @plans.each do |plan| %>
+            <label class="plan-option">
+              <%= form.radio_button :plan_id,
+                                    plan.id,
+                                    checked: @draft["plan_id"].to_s == plan.id.to_s %>
+
+              <div class="plan-card">
+                <div class="plan-card__header">
+                  <strong class="plan-card__title"><%= plan.name %></strong>
+                  <span class="plan-card__price">$<%= number_with_precision(plan.price, precision: 0) %>/month</span>
+                </div>
+
+                <p class="plan-card__range">
+                  <% if plan.min_diameter.zero? %>
+                    Less than <%= plan.max_diameter %>km in diameter
+                  <% else %>
+                    <%= plan.min_diameter %>km – <%= plan.max_diameter %>km in diameter
+                  <% end %>
+                </p>
+
+                <p class="plan-card__description"><%= plan.description %></p>
+              </div>
+            </label>
+          <% end %>
+        </fieldset>
+
+        <div class="form-actions">
+          <%= link_to "Back", onboarding_path(step: "account"), class: "button secondary" %>
+          <%= form.submit "Review subscription", class: "button primary" %>
+        </div>
+
+      <% elsif @step == "confirm" %>
+  <% selected_plan = @plans.find { |plan| plan.id.to_s == @draft["plan_id"].to_s } %>
+
+  <section class="confirmation-summary">
+    <h2>Review your subscription</h2>
+
+    <dl class="confirmation">
+      <div>
+        <dt>Name</dt>
+        <dd><%= @draft["name"] %></dd>
+      </div>
+
+      <div>
+        <dt>Email</dt>
+        <dd><%= @draft["email"] %></dd>
+      </div>
+
+      <div>
+        <dt>Address</dt>
+        <dd><%= simple_format(@draft["address"]) %></dd>
+      </div>
+
+      <div>
+        <dt>Plan</dt>
+        <dd>
+          <% if selected_plan %>
+            <strong><%= selected_plan.name %></strong>
+            <div>$<%= number_with_precision(selected_plan.price, precision: 0) %>/month</div>
+            <div>
+              <% if selected_plan.min_diameter.zero? %>
+                Less than <%= selected_plan.max_diameter %>km in diameter
+              <% else %>
+                <%= selected_plan.min_diameter %>km – <%= selected_plan.max_diameter %>km in diameter
+              <% end %>
+            </div>
+          <% else %>
+            <%= @draft["plan_id"] %>
+          <% end %>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <div class="form-actions">
+    <%= link_to "Back", onboarding_path(step: "plan"), class: "button secondary" %>
+    <%= form.submit "Continue to payment", class: "button primary" %>
+  </div>
+<% end %>
+
+    <% end %>
+  <% end %>
+</main>

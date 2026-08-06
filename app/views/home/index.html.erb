@@ -1,0 +1,25 @@
+<section class="hero">
+  <p class="eyebrow">Acme</p>
+
+  <h1>Asteroids, straight to your doorstep.</h1>
+
+  <p>
+    A simple subscription service for asteroid enthusiasts. Each month, we send you a new asteroid from the solar system to add to your collection.
+  </p>
+
+  <p>
+    No refunds.
+  </p>
+
+  <%= link_to "Start your subscription",
+              onboarding_path(step: 1),
+              class: "button" %>
+
+  <%= link_to "View plans", "#plans" %>
+</section>
+
+<section id="plans">
+  <h2>Choose the plan that fits your collection</h2>
+
+  <%= render partial: "plans/card", collection: @plans, as: :plan %>
+</section>
