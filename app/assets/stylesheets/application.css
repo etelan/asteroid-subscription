@@ -438,31 +438,84 @@ input[type="submit"]:hover {
   color: #c9d6ff;
 }
 
+.onboarding .asteroid-summary {
+  margin-bottom: 2rem;
+}
+
+.onboarding .card {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1.75rem;
+  border-radius: 24px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.16);
+}
+
+.onboarding .asteroid-summary .eyebrow {
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.onboarding .asteroid-name {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 1.05;
+}
+
+.onboarding .asteroid-meta {
+  margin: 0.7rem 0 1.4rem;
+  color: var(--muted);
+}
+
+.onboarding .asteroid-grid {
+  display: grid;
+  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.onboarding .asteroid-grid dt {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.onboarding .asteroid-grid dd {
+  margin: 0.4rem 0 0;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.onboarding .asteroid-grid .hint {
+  display: block;
+  margin-top: 0.35rem;
+  color: #c9d6ff;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
 .onboarding .confirmation-summary {
-  margin-top: 32px;
+  margin-bottom: 1.5rem;
 }
 
 .onboarding .confirmation {
   display: grid;
   gap: 18px;
-  margin: 24px 0;
-}
-
-.onboarding .confirmation div {
-  display: grid;
-  gap: 6px;
 }
 
 .onboarding .confirmation dt {
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
 }
 
 .onboarding .confirmation dd {
-  margin: 0;
-  color: var(--text);
+  margin: 0.35rem 0 0;
   font-size: 1rem;
   line-height: 1.6;
 }

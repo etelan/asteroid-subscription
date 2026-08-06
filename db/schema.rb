@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_06_115429) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_06_123137) do
   create_table "asteroids", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.float "diameter"
@@ -23,6 +23,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_06_115429) do
     t.string "spkid", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
+    t.index ["diameter", "id"], name: "index_asteroids_on_diameter_and_id"
+    t.index ["diameter"], name: "index_asteroids_on_diameter"
     t.index ["spkid"], name: "index_asteroids_on_spkid", unique: true
     t.index ["user_id"], name: "index_asteroids_on_user_id"
   end

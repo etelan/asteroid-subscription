@@ -1,31 +1,67 @@
 class OnboardingController < ApplicationController
   STEPS = %w[account plan confirm].freeze
 
+  before_action :set_step
   before_action :load_draft
   before_action :load_plans, only: %i[show update]
+  before_action :load_selected_plan, only: %i[show update]
+  before_action :load_selected_asteroid, only: %i[show update]
 
   def show
-    @step = normalize_step(params[:step])
   end
 
   def update
-    @step = normalize_step(params[:step])
-
     @draft.merge!(submitted_attributes)
 
-    if @step == "account" && account_valid?
-      redirect_to onboarding_path(step: "plan")
-    elsif @step == "plan" && plan_valid?
+    if @step == "plan"
+      @draft.delete("asteroid_id")
+      session[:onboarding] = @draft
       redirect_to onboarding_path(step: "confirm")
-    elsif @step == "confirm" && confirmation_valid?
-      complete_onboarding
-    else
-      @error = "Please complete the required fields."
-      render :show, status: :unprocessable_entity
+      return
     end
+
+    if @step == "confirm"
+      unless @selected_plan
+        @error = "Please select a plan first."
+        render :show, status: :unprocessable_entity
+        return
+      end
+
+      unless @selected_asteroid
+        @error = "No asteroid available for this plan."
+        render :show, status: :unprocessable_entity
+        return
+      end
+
+      user = User.new(
+        name: @draft["name"],
+        email: @draft["email"],
+        address: @draft["address"],
+        plan: @selected_plan,
+        plan_start_date: Date.current,
+        upcoming_asteroid: @selected_asteroid
+      )
+
+      if user.save
+        @selected_asteroid.update(user: user)
+        session.delete(:onboarding)
+        redirect_to root_path, notice: "Subscription ready."
+      else
+        @error = user.errors.full_messages.to_sentence
+        render :show, status: :unprocessable_entity
+      end
+
+      return
+    end
+
+    redirect_to onboarding_path(step: next_step(@step))
   end
 
   private
+
+  def set_step
+    @step = normalize_step(params[:step])
+  end
 
   def load_draft
     session[:onboarding] ||= {}
@@ -37,31 +73,40 @@ class OnboardingController < ApplicationController
   end
 
   def submitted_attributes
-    params.permit(:name, :email, :address, :plan_id).to_h
-  end
-
-  def account_valid?
-    @draft["name"].present? && @draft["email"].present?
-  end
-
-  def plan_valid?
-    @plans.exists?(id: @draft["plan_id"])
-  end
-
-  def confirmation_valid?
-    @draft["name"].present? &&
-      @draft["email"].present? &&
-      plan_valid?
+    params.permit(:name, :email, :address, :plan_id, :step).to_h
   end
 
   def load_plans
     @plans = Plan.order(:min_diameter)
   end
 
-  def complete_onboarding
-    session.delete(:onboarding)
+  def load_selected_plan
+    @selected_plan = Plan.find_by(id: @draft["plan_id"])
+  end
 
-    redirect_to root_path,
-                notice: "Your subscription setup is ready."
+  def load_selected_asteroid
+    return unless @selected_plan
+    return unless @step == "confirm"
+
+    @draft["asteroid_id"] ||= pick_random_asteroid_id(@selected_plan)
+    session[:onboarding] = @draft
+    @selected_asteroid = Asteroid.find_by(id: @draft["asteroid_id"])
+    puts "Selected asteroid: #{@selected_asteroid&.inspect || 'none'}"
+  end
+
+  def pick_random_asteroid_id(plan)
+    Asteroid
+      .where(diameter: plan.min_diameter..plan.max_diameter)
+      .order(Arel.sql("RANDOM()"))
+      .limit(1)
+      .pick(:id)
+  end
+
+  def next_step(step)
+    case step
+    when "account" then "plan"
+    when "plan" then "confirm"
+    else "confirm"
+    end
   end
 end

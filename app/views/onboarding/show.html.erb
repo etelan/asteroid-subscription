@@ -111,53 +111,104 @@
         </div>
 
       <% elsif @step == "confirm" %>
-  <% selected_plan = @plans.find { |plan| plan.id.to_s == @draft["plan_id"].to_s } %>
+        <% selected_plan = @plans.find { |plan| plan.id.to_s == @draft["plan_id"].to_s } %>
+        <% asteroid = @selected_asteroid %>
+        <% moid_km = asteroid&.moid_ld.to_f * 384_400 %>
 
-  <section class="confirmation-summary">
-    <h2>Review your subscription</h2>
+        <% if asteroid %>
+          <section class="asteroid-summary card">
+            <p class="eyebrow">Asteroid</p>
 
-    <dl class="confirmation">
-      <div>
-        <dt>Name</dt>
-        <dd><%= @draft["name"] %></dd>
-      </div>
-
-      <div>
-        <dt>Email</dt>
-        <dd><%= @draft["email"] %></dd>
-      </div>
-
-      <div>
-        <dt>Address</dt>
-        <dd><%= simple_format(@draft["address"]) %></dd>
-      </div>
-
-      <div>
-        <dt>Plan</dt>
-        <dd>
-          <% if selected_plan %>
-            <strong><%= selected_plan.name %></strong>
-            <div>$<%= number_with_precision(selected_plan.price, precision: 0) %>/month</div>
-            <div>
-              <% if selected_plan.min_diameter.zero? %>
-                Less than <%= selected_plan.max_diameter %>km in diameter
-              <% else %>
-                <%= selected_plan.min_diameter %>km – <%= selected_plan.max_diameter %>km in diameter
+            <h2 class="asteroid-name"><%= asteroid.full_name %></h2>
+            <p class="asteroid-meta">
+              <span class="asteroid-id">SPKID: <%= asteroid.spkid %></span>
+              <% if asteroid.kind.present? %>
+                · <%= asteroid.kind %>
               <% end %>
-            </div>
-          <% else %>
-            <%= @draft["plan_id"] %>
-          <% end %>
-        </dd>
-      </div>
-    </dl>
-  </section>
+            </p>
 
-  <div class="form-actions">
-    <%= link_to "Back", onboarding_path(step: "plan"), class: "button secondary" %>
-    <%= form.submit "Continue to payment", class: "button primary" %>
-  </div>
-<% end %>
+            <div class="asteroid-grid">
+              <div>
+                <dt>Width</dt>
+                <dd><%= number_with_precision(asteroid.diameter, precision: 3) %> km</dd>
+              </div>
+
+              <div>
+                <dt>Uncertainty estimate</dt>
+                <dd>
+                  <strong>± <%= number_with_precision(asteroid.diameter_sigma, precision: 3) %> km</strong>
+                </dd>
+              </div>
+
+              <div>
+                <dt>MOID</dt>
+                <dd>
+                  <%= number_with_precision(asteroid.moid_ld, precision: 1) %> LD
+                  <span class="hint">
+                    minimum orbital intersection distance to Earth;
+                    ≈ <%= number_with_delimiter(moid_km.round) %> km
+                  </span>
+                </dd>
+              </div>
+
+              <div>
+                <dt>First observation</dt>
+                <dd><%= asteroid.first_obs&.to_date&.strftime("%B %-d, %Y") %></dd>
+              </div>
+
+              <div>
+                <dt>Last observation</dt>
+                <dd><%= asteroid.last_obs&.to_date&.strftime("%B %-d, %Y") %></dd>
+              </div>
+            </div>
+          </section>
+        <% end %>
+
+        <section class="confirmation-summary card">
+          <h2>Review your subscription</h2>
+
+          <dl class="confirmation">
+            <div>
+              <dt>Name</dt>
+              <dd><%= @draft["name"] %></dd>
+            </div>
+
+            <div>
+              <dt>Email</dt>
+              <dd><%= @draft["email"] %></dd>
+            </div>
+
+            <div>
+              <dt>Address</dt>
+              <dd><%= simple_format(@draft["address"]) %></dd>
+            </div>
+
+            <div>
+              <dt>Plan</dt>
+              <dd>
+                <% if selected_plan %>
+                  <strong><%= selected_plan.name %></strong>
+                  <div>$<%= number_with_precision(selected_plan.price, precision: 0) %>/month</div>
+                  <div>
+                    <% if selected_plan.min_diameter.zero? %>
+                      Less than <%= selected_plan.max_diameter %> km
+                    <% else %>
+                      <%= selected_plan.min_diameter %> km – <%= selected_plan.max_diameter %> km
+                    <% end %>
+                  </div>
+                <% else %>
+                  Not selected
+                <% end %>
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <div class="form-actions">
+          <%= link_to "Back", onboarding_path(step: "plan"), class: "button secondary" %>
+          <%= form.submit "Continue to payment", class: "button primary" %>
+        </div>
+      <% end %>
 
     <% end %>
   <% end %>
