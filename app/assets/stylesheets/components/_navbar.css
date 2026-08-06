@@ -1,11 +1,25 @@
 .site-header nav {
   display: flex;
   gap: 24px;
+  flex-wrap: nowrap;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .site-header nav a {
   color: var(--muted);
   text-decoration: none;
+}
+
+.site-header nav a.button {
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: var(--cyan);
+  color: #fff;
+}
+
+.site-header nav a.button:hover {
+  background: var(--cyan-dark);
 }
 
 .site-header nav a:hover {

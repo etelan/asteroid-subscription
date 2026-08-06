@@ -334,18 +334,42 @@ input[type="submit"]:hover {
   color: var(--muted);
 }
 
-.onboarding input[type="text"],
-.onboarding input[type="email"],
-.onboarding textarea {
+input[type="password"],
+input[type="text"],
+input[type="email"],
+textarea {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);
-  font: inherit;
-  line-height: 1.5;
+  color: #fff;
+  font-size: 16px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background 0.2s ease;
+  appearance: none;
+}
+
+textarea {
+  min-height: 110px;
   resize: vertical;
+}
+
+input[type="password"]:focus,
+textarea:focus {
+  border-color: var(--cyan);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(56, 255, 255, 0.12);
+  outline: none;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.form-error {
+  color: #ff6b6b;
 }
 
 .onboarding input:focus {

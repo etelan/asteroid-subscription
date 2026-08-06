@@ -13,6 +13,18 @@ class OnboardingController < ApplicationController
   def update
     @draft.merge!(submitted_attributes)
 
+    if @step == "account"
+      if params[:password] != params[:password_confirmation]
+        @error = "Passwords must match."
+        @draft["name"] = params[:name]
+        @draft["email"] = params[:email]
+        @draft["address"] = params[:address]
+        @error = "Passwords do not match."
+        render :show, status: :unprocessable_entity
+        return
+      end
+    end
+
     if @step == "plan"
       @draft.delete("asteroid_id")
       session[:onboarding] = @draft
