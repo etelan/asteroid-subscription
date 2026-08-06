@@ -2,216 +2,232 @@
   <h1>Set up your subscription</h1>
 
   <%= turbo_frame_tag "onboarding_step" do %>
-    <nav aria-label="Onboarding progress">
-      <ol>
-        <li class="<%= "current" if @step == "account" %>">
-          1. Account
-        </li>
+    <% if @submission_complete %>
+      <section class="card confirmation-success" aria-live="polite">
+        <h2>You may pay on arrival 😉</h2>
+        <p>Your request has been saved.</p>
 
-        <li class="<%= "current" if @step == "plan" %>">
-          2. Plan
-        </li>
-
-        <li class="<%= "current" if @step == "confirm" %>">
-          3. Confirm
-        </li>
-      </ol>
-    </nav>
-
-    <% if @error.present? %>
-      <p class="form-error" role="alert">
-        <%= @error %>
-      </p>
-    <% end %>
-
-    <%= form_with url: onboarding_path(step: @step),
-                  method: :patch,
-                  autocomplete: "on" do |form| %>
-
-      <% if @step == "account" %>
-        <fieldset>
-          <legend>Tell us about yourself</legend>
-
-          <div class="form-field">
-            <%= form.label :name, "Your name" %>
-
-            <%= form.text_field :name,
-                                value: @draft["name"],
-                                placeholder: "Alex Morgan",
-                                autocomplete: "name",
-                                required: true,
-                                autofocus: true %>
-
-            <small>Example: Alex Morgan</small>
-          </div>
-
-          <div class="form-field">
-            <%= form.label :email, "Email address" %>
-
-            <%= form.email_field :email,
-                                 value: @draft["email"],
-                                 placeholder: "alex@example.com",
-                                 autocomplete: "email",
-                                 required: true %>
-
-            <small>Example: alex@example.com</small>
-          </div>
-
-          <div class="form-field">
-            <%= form.label :address, "Shipping address" %>
-
-            <%= form.text_area :address,
-                               value: @draft["address"],
-                               placeholder: "123 Example Street&#10;London SW1A 1AA",
-                               autocomplete: "shipping street-address",
-                               rows: 2,
-                               required: true %>
-
-            <small>
-              Example: 123 Example Street, London SW1A 1AA
-            </small>
-          </div>
-
-          <div class="form-field">
-            <%= form.label :password, "Password" %>
-            <%= form.password_field :password,
-                                    minlength: 8,
-                                    required: true,
-                                    autocomplete: "new-password" %>
-          </div>
-
-          <div class="form-field">
-            <%= form.label :password_confirmation, "Confirm password" %>
-            <%= form.password_field :password_confirmation,
-                                    minlength: 8,
-                                    required: true,
-                                    autocomplete: "new-password" %>
-            <p class="field-hint">Password must be at least 8 characters.</p>
-          </div>
-        </fieldset>
-
-        <%= form.submit "Continue to plans" %>
-
-      <% elsif @step == "plan" %>
-        <fieldset class="plan-grid">
-          <legend>Choose a plan</legend>
-
-          <% @plans.each do |plan| %>
-            <label class="plan-option">
-              <%= form.radio_button :plan_id,
-                                    plan.id,
-                                    checked: @draft["plan_id"].to_s == plan.id.to_s %>
-
-              <%= render partial: "plans/card", locals: { plan: plan } %>
-            </label>
-          <% end %>
-        </fieldset>
-
-        <div class="form-actions">
-          <%= link_to "Back", onboarding_path(step: "account"), class: "button secondary" %>
-          <%= form.submit "Review subscription", class: "button primary" %>
-        </div>
-
-      <% elsif @step == "confirm" %>
-        <% selected_plan = @plans.find { |plan| plan.id.to_s == @draft["plan_id"].to_s } %>
-        <% asteroid = @selected_asteroid %>
-        <% moid_km = asteroid&.moid_ld.to_f * 384_400 %>
-
-        <% if asteroid %>
-          <section class="asteroid-summary card">
-            <p class="eyebrow">Asteroid</p>
-
-            <h2 class="asteroid-name"><%= asteroid.full_name %></h2>
-            <p class="asteroid-meta">
-              <span class="asteroid-id">SPKID: <%= asteroid.spkid %></span>
-              <% if asteroid.kind.present? %>
-                · <%= asteroid.kind %>
-              <% end %>
-            </p>
-
-            <div class="asteroid-grid">
-              <div>
-                <dt>Width</dt>
-                <dd><%= number_with_precision(asteroid.diameter, precision: 3) %> km</dd>
-              </div>
-
-              <div>
-                <dt>Uncertainty estimate</dt>
-                <dd>
-                  <strong>± <%= number_with_precision(asteroid.diameter_sigma, precision: 3) %> km</strong>
-                </dd>
-              </div>
-
-              <div>
-                <dt>MOID</dt>
-                <dd>
-                  <%= number_with_precision(asteroid.moid_ld, precision: 1) %> LD
-                  <span class="hint">
-                    minimum orbital intersection distance to Earth;
-                    ≈ <%= number_with_delimiter(moid_km.round) %> km
-                  </span>
-                </dd>
-              </div>
-
-              <div>
-                <dt>First observation</dt>
-                <dd><%= asteroid.first_obs&.to_date&.strftime("%B %-d, %Y") %></dd>
-              </div>
-
-              <div>
-                <dt>Last observation</dt>
-                <dd><%= asteroid.last_obs&.to_date&.strftime("%B %-d, %Y") %></dd>
-              </div>
-            </div>
-          </section>
+        <% if @saved_asteroid.present? %>
+          <p>Here is your asteroid:</p>
+          <%= link_to "View asteroid", asteroid_path(@saved_asteroid), class: "button primary" %>
         <% end %>
 
-        <section class="confirmation-summary card">
-          <h2>Review your subscription</h2>
-
-          <dl class="confirmation">
-            <div>
-              <dt>Name</dt>
-              <dd><%= @draft["name"] %></dd>
-            </div>
-
-            <div>
-              <dt>Email</dt>
-              <dd><%= @draft["email"] %></dd>
-            </div>
-
-            <div>
-              <dt>Address</dt>
-              <dd><%= simple_format(@draft["address"]) %></dd>
-            </div>
-
-            <div>
-              <dt>Plan</dt>
-              <dd>
-                <% if selected_plan %>
-                  <strong><%= selected_plan.name %></strong>
-                  <div>$<%= number_with_precision(selected_plan.price, precision: 0) %>/month</div>
-                  <div>
-                    <% if selected_plan.min_diameter.zero? %>
-                      Less than <%= selected_plan.max_diameter %> km
-                    <% else %>
-                      <%= selected_plan.min_diameter %> km – <%= selected_plan.max_diameter %> km
-                    <% end %>
-                  </div>
-                <% else %>
-                  Not selected
-                <% end %>
-              </dd>
-            </div>
-          </dl>
-        </section>
-
         <div class="form-actions">
-          <%= link_to "Back", onboarding_path(step: "plan"), class: "button secondary" %>
-          <%= form.submit "Continue to payment", class: "button primary" %>
+          <%= link_to "Return home", root_path, class: "button secondary" %>
         </div>
+      </section>
+    <% else %>
+      <nav aria-label="Onboarding progress">
+        <ol>
+          <li class="<%= "current" if @step == "account" %>">
+            1. Account
+          </li>
+
+          <li class="<%= "current" if @step == "plan" %>">
+            2. Plan
+          </li>
+
+          <li class="<%= "current" if @step == "confirm" %>">
+            3. Confirm
+          </li>
+        </ol>
+      </nav>
+
+      <% if @error.present? %>
+        <p class="form-error" role="alert">
+          <%= @error %>
+        </p>
       <% end %>
 
+      <%= form_with url: onboarding_path(step: @step),
+                    method: :patch,
+                    autocomplete: "on" do |form| %>
+
+        <% if @step == "account" %>
+          <fieldset>
+            <legend>Tell us about yourself</legend>
+
+            <div class="form-field">
+              <%= form.label :name, "Your name" %>
+
+              <%= form.text_field :name,
+                                  value: @draft["name"],
+                                  placeholder: "Alex Morgan",
+                                  autocomplete: "name",
+                                  required: true,
+                                  autofocus: true %>
+
+              <small>Example: Alex Morgan</small>
+            </div>
+
+            <div class="form-field">
+              <%= form.label :email, "Email address" %>
+
+              <%= form.email_field :email,
+                                   value: @draft["email"],
+                                   placeholder: "alex@example.com",
+                                   autocomplete: "email",
+                                   required: true %>
+
+              <small>Example: alex@example.com</small>
+            </div>
+
+            <div class="form-field">
+              <%= form.label :address, "Shipping address" %>
+
+              <%= form.text_area :address,
+                                 value: @draft["address"],
+                                 placeholder: "123 Example Street&#10;London SW1A 1AA",
+                                 autocomplete: "shipping street-address",
+                                 rows: 2,
+                                 required: true %>
+
+              <small>
+                Example: 123 Example Street, London SW1A 1AA
+              </small>
+            </div>
+
+            <div class="form-field">
+              <%= form.label :password, "Password" %>
+              <%= form.password_field :password,
+                                      minlength: 8,
+                                      required: true,
+                                      autocomplete: "new-password" %>
+            </div>
+
+            <div class="form-field">
+              <%= form.label :password_confirmation, "Confirm password" %>
+              <%= form.password_field :password_confirmation,
+                                      minlength: 8,
+                                      required: true,
+                                      autocomplete: "new-password" %>
+              <p class="field-hint">Password must be at least 8 characters.</p>
+            </div>
+          </fieldset>
+
+          <%= form.submit "Continue to plans" %>
+
+        <% elsif @step == "plan" %>
+          <fieldset class="plan-grid">
+            <legend>Choose a plan</legend>
+
+            <% @plans.each do |plan| %>
+              <label class="plan-option">
+                <%= form.radio_button :plan_id,
+                                      plan.id,
+                                      checked: @draft["plan_id"].to_s == plan.id.to_s %>
+
+                <%= render partial: "plans/card", locals: { plan: plan } %>
+              </label>
+            <% end %>
+          </fieldset>
+
+          <div class="form-actions">
+            <%= link_to "Back", onboarding_path(step: "account"), class: "button secondary" %>
+            <%= form.submit "Review subscription", class: "button primary" %>
+          </div>
+
+        <% elsif @step == "confirm" %>
+          <% selected_plan = @plans.find { |plan| plan.id.to_s == @draft["plan_id"].to_s } %>
+          <% asteroid = @selected_asteroid %>
+          <% moid_km = asteroid&.moid_ld.to_f * 384_400 %>
+
+          <% if asteroid %>
+            <section class="asteroid-summary card">
+              <p class="eyebrow">Asteroid</p>
+
+              <h2 class="asteroid-name"><%= asteroid.full_name %></h2>
+              <p class="asteroid-meta">
+                <span class="asteroid-id">SPKID: <%= asteroid.spkid %></span>
+                <% if asteroid.kind.present? %>
+                  · <%= asteroid.kind %>
+                <% end %>
+              </p>
+
+              <div class="asteroid-grid">
+                <div>
+                  <dt>Width</dt>
+                  <dd><%= number_with_precision(asteroid.diameter, precision: 3) %> km</dd>
+                </div>
+
+                <div>
+                  <dt>Uncertainty estimate</dt>
+                  <dd>
+                    <strong>± <%= number_with_precision(asteroid.diameter_sigma, precision: 3) %> km</strong>
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>MOID</dt>
+                  <dd>
+                    <%= number_with_precision(asteroid.moid_ld, precision: 1) %> LD
+                    <span class="hint">
+                      minimum orbital intersection distance to Earth;
+                      ≈ <%= number_with_delimiter(moid_km.round) %> km
+                    </span>
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>First observation</dt>
+                  <dd><%= asteroid.first_obs&.to_date&.strftime("%B %-d, %Y") %></dd>
+                </div>
+
+                <div>
+                  <dt>Last observation</dt>
+                  <dd><%= asteroid.last_obs&.to_date&.strftime("%B %-d, %Y") %></dd>
+                </div>
+              </div>
+            </section>
+          <% end %>
+
+          <section class="confirmation-summary card">
+            <h2>Review your subscription</h2>
+
+            <dl class="confirmation">
+              <div>
+                <dt>Name</dt>
+                <dd><%= @draft["name"] %></dd>
+              </div>
+
+              <div>
+                <dt>Email</dt>
+                <dd><%= @draft["email"] %></dd>
+              </div>
+
+              <div>
+                <dt>Address</dt>
+                <dd><%= simple_format(@draft["address"]) %></dd>
+              </div>
+
+              <div>
+                <dt>Plan</dt>
+                <dd>
+                  <% if selected_plan %>
+                    <strong><%= selected_plan.name %></strong>
+                    <div>$<%= number_with_precision(selected_plan.price, precision: 0) %>/month</div>
+                    <div>
+                      <% if selected_plan.min_diameter.zero? %>
+                        Less than <%= selected_plan.max_diameter %> km
+                      <% else %>
+                        <%= selected_plan.min_diameter %> km – <%= selected_plan.max_diameter %> km
+                      <% end %>
+                    </div>
+                  <% else %>
+                    Not selected
+                  <% end %>
+                </dd>
+              </div>
+            </dl>
+          </section>
+
+          <div class="form-actions">
+            <%= link_to "Back", onboarding_path(step: "plan"), class: "button secondary" %>
+            <%= form.submit "Continue to payment", class: "button primary" %>
+          </div>
+        <% end %>
+
+      <% end %>
     <% end %>
   <% end %>
 </main>

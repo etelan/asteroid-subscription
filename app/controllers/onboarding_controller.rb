@@ -23,7 +23,12 @@ class OnboardingController < ApplicationController
         if user.save
           @wizard.asteroid_for_preview.update(user: user)
           session.delete(:onboarding)
-          redirect_to root_path, notice: "Subscription ready."
+
+          @submission_complete = true
+          @saved_asteroid = @wizard.asteroid_for_preview
+          sync_view_state
+          @step = "complete"
+          render :show
           return
         end
 
