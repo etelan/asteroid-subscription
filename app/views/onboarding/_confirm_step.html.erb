@@ -1,0 +1,99 @@
+<% asteroid = wizard.selected_asteroid %>
+<% plan = wizard.selected_plan %>
+
+<% if asteroid %>
+  <section class="asteroid-summary card">
+    <p class="eyebrow">Asteroid</p>
+
+    <h2 class="asteroid-name"><%= asteroid.full_name %></h2>
+
+    <p class="asteroid-meta">
+      <span class="asteroid-id">SPKID: <%= asteroid.spkid %></span>
+      <% if asteroid.kind.present? %>
+        · <%= asteroid.kind %>
+      <% end %>
+    </p>
+
+    <div class="asteroid-grid">
+      <div>
+        <dt>Width</dt>
+        <dd><%= asteroid.diameter_display %></dd>
+      </div>
+
+      <div>
+        <dt>Uncertainty estimate</dt>
+        <dd><strong><%= asteroid.diameter_sigma_display %></strong></dd>
+      </div>
+
+      <div>
+        <dt>MOID</dt>
+        <dd>
+          <%= asteroid.moid_ld_display %>
+          <span class="hint">
+            minimum orbital intersection distance to Earth;
+            ≈ <%= asteroid.moid_km_display %>
+          </span>
+        </dd>
+      </div>
+
+      <div>
+        <dt>First observation</dt>
+        <dd><%= asteroid.first_observation_display %></dd>
+      </div>
+
+      <div>
+        <dt>Last observation</dt>
+        <dd><%= asteroid.last_observation_display %></dd>
+      </div>
+    </div>
+  </section>
+<% end %>
+
+<section class="confirmation-summary card">
+  <h2>Review your subscription</h2>
+
+  <dl class="confirmation">
+    <div>
+      <dt>Name</dt>
+      <dd><%= wizard.name %></dd>
+    </div>
+
+    <div>
+      <dt>Email</dt>
+      <dd><%= wizard.email %></dd>
+    </div>
+
+    <div>
+      <dt>Address</dt>
+      <dd><%= simple_format(wizard.address) %></dd>
+    </div>
+
+    <div>
+      <dt>Plan</dt>
+      <dd>
+        <% if plan %>
+          <strong><%= plan.name %></strong>
+          <div>$<%= number_with_precision(plan.price, precision: 0) %>/month</div>
+
+          <div>
+            <% if plan.min_diameter.zero? %>
+              Less than <%= plan.max_diameter %> km
+            <% else %>
+              <%= plan.min_diameter %> km – <%= plan.max_diameter %> km
+            <% end %>
+          </div>
+        <% else %>
+          Not selected
+        <% end %>
+      </dd>
+    </div>
+  </dl>
+</section>
+
+<div class="form-actions">
+  <%= link_to "Back",
+              onboarding_path(step: "plan"),
+              class: "button secondary" %>
+
+  <%= form.submit "Continue to payment", class: "button primary" %>
+</div>

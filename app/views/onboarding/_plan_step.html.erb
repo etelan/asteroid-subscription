@@ -1,0 +1,21 @@
+<fieldset class="plan-grid">
+  <legend>Choose a plan</legend>
+
+  <% wizard.plans.each do |plan| %>
+    <label class="plan-option">
+      <%= form.radio_button :plan_id,
+                            plan.id,
+                            checked: wizard.plan_id.to_s == plan.id.to_s %>
+
+      <%= render "plans/card", plan: plan %>
+    </label>
+  <% end %>
+</fieldset>
+
+<div class="form-actions">
+  <%= link_to "Back",
+              onboarding_path(step: "account"),
+              class: "button secondary" %>
+
+  <%= form.submit "Review subscription", class: "button primary" %>
+</div>

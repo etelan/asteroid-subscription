@@ -1,18 +1,10 @@
 @import "components/navbar";
-/*
-  ACME UI
-  ----------
-  Sections:
-  1. Theme
-  2. Reset
-  3. Space background
-  4. Header
-  5. Homepage
-  6. Onboarding
-  7. Responsive rules
-  8. Reduced motion
-*/
 
+/* Please note, this is a horrible long single CSS file. 
+I split up the navbar and admin code into two other files,
+but this is clearly not best practise.
+
+If I had more time, I would split these out into seperate files. */
 
 /* =========================================================
    1. Theme

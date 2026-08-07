@@ -1,3 +1,9 @@
+# In my spare time, I've been playing about with the NASA JPL Small Body Databases.
+# This script imports the asteroid records into our databases.
+# If I Had More Time: I'd make this a background job that runs on a schedule to keep the database up to date.
+
+# ...however, one asteroid would likely get the company shut down anyway.
+
 namespace :asteroids do
   desc "Ingest asteroid records from JPL SBDB using plan diameter ranges"
   task ingest: :environment do

@@ -1,0 +1,20 @@
+<section class="card confirmation-success" aria-live="polite">
+  <h2>You may pay on arrival 😉</h2>
+  <p>Your request has been saved.</p>
+
+  <% if wizard.saved_asteroid.present? %>
+    <p>Here is your asteroid:</p>
+
+    <%= link_to "View asteroid",
+                asteroid_path(wizard.saved_asteroid),
+                class: "button primary",
+                data: { turbo_frame: "_top" } %>
+  <% end %>
+
+  <div class="form-actions">
+    <%= link_to "Return home",
+                root_path,
+                class: "button secondary",
+                data: { turbo_frame: "_top" } %>
+  </div>
+</section>

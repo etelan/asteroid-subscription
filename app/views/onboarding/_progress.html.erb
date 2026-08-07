@@ -1,0 +1,16 @@
+<%# At the top: 1. Account / 2. Plan / 3. Confirm %>
+<nav aria-label="Onboarding progress">
+  <ol>
+    <li class="<%= "current" if wizard.step == "account" %>">
+      1. Account
+    </li>
+
+    <li class="<%= "current" if wizard.step == "plan" %>">
+      2. Plan
+    </li>
+
+    <li class="<%= "current" if wizard.step == "confirm" %>">
+      3. Confirm
+    </li>
+  </ol>
+</nav>

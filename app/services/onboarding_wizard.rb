@@ -1,59 +1,110 @@
 class OnboardingWizard
-  # Ordered list of steps in the onboarding flow.
   STEPS = %w[account plan confirm].freeze
 
-  attr_reader :session, :step, :plans, :draft, :selected_plan, :selected_asteroid, :error
+  attr_reader :step, :plans, :error, :saved_asteroid
 
-  # Initializes the wizard state from the session and incoming params.
-  #
-  # session - Rails session object used to persist onboarding progress.
-  # params  - Request parameters for the current step.
+  # Initialise with
+  # user's session,
+  # users's http params,
+  # user's temp onboarding data,
+  # step they are on,
+  # what plan they picked,
+  # and if they have finished or not
   def initialize(session:, params: {})
     @session = session
+    @params = params
     @draft = load_draft
     @step = normalize_step(params[:step])
-    @params = params
-
-    # Plans are displayed on the plan selection step.
     @plans = Plan.order(:min_diameter)
-
-    # Restore the user's selected plan from the draft data.
-    @selected_plan = Plan.find_by(id: draft["plan_id"])
-
-    # Memoized later when previewing the assigned asteroid.
-    @selected_asteroid = nil
+    @finished = false
   end
 
-  # Merges submitted data into the draft and validates
-  # the current step.
-  #
-  # Returns true when the step is valid, otherwise false.
+  # The next button.
+  # Temp Save Data -> Validate Data -> Next step
   def submit
     merge_draft(submitted_attributes)
 
     case step
-    when "account"
-      validate_account_step
-    when "plan"
-      validate_plan_step
-    when "confirm"
-      validate_confirm_step
-    else
-      true
+    when "account" then validate_account_step
+    when "plan"    then validate_plan_step
+    when "confirm" then complete_onboarding
     end
   end
 
-  # Returns the next step in the onboarding flow.
+  def finished?
+    @finished
+  end
+
   def next_step
-    case step
-    when "account" then "plan"
-    when "plan" then "confirm"
-    else "confirm"
-    end
+    STEPS.fetch(STEPS.index(step) + 1, STEPS.last)
   end
 
-  # Assigns a random asteroid matching the selected plan's
-  # diameter range. The assignment only happens once.
+  def name
+    draft["name"]
+  end
+
+  def email
+    draft["email"]
+  end
+
+  def address
+    draft["address"]
+  end
+
+  def plan_id
+    draft["plan_id"]
+  end
+
+  def selected_plan
+    @selected_plan ||= Plan.find_by(id: plan_id)
+  end
+
+  def selected_asteroid
+    @selected_asteroid ||= Asteroid.find_by(id: draft["asteroid_id"])
+  end
+
+  private
+
+  attr_reader :session, :params, :draft
+
+  def load_draft
+    session[:onboarding] ||= {}
+  end
+
+  def persist_draft
+    session[:onboarding] = draft
+  end
+
+  def normalize_step(step)
+    STEPS.include?(step.to_s) ? step.to_s : STEPS.first
+  end
+
+  def submitted_attributes
+    params.permit(
+      :name,
+      :email,
+      :address,
+      :plan_id,
+      :password,
+      :password_confirmation
+    ).to_h
+  end
+
+  def merge_draft(attributes)
+    previous_plan_id = plan_id
+
+    draft.merge!(attributes)
+
+    if plan_id != previous_plan_id
+      draft.delete("asteroid_id")
+      @selected_plan = nil
+      @selected_asteroid = nil
+      choose_asteroid!
+    end
+
+    persist_draft
+  end
+
   def choose_asteroid!
     return unless selected_plan
     return if draft["asteroid_id"].present?
@@ -67,98 +118,73 @@ class OnboardingWizard
     persist_draft
   end
 
-  # Returns the assigned asteroid for preview purposes.
-  # Result is memoized for repeated access.
-  def asteroid_for_preview
-    @selected_asteroid ||= Asteroid.find_by(id: draft["asteroid_id"])
-  end
-
-  # Returns the currently selected plan.
-  def plan_summary
-    selected_plan
-  end
-
-  private
-
-  attr_reader :params
-
-  # Loads the onboarding draft from the session,
-  # creating an empty draft if none exists.
-  def load_draft
-    session[:onboarding] ||= {}
-    session[:onboarding]
-  end
-
-  # Persists the current draft back into the session.
-  def persist_draft
-    session[:onboarding] = draft
-  end
-
-  # Ensures only valid onboarding steps can be used.
-  # Defaults to the first step if an invalid value is provided.
-  def normalize_step(step)
-    STEPS.include?(step.to_s) ? step.to_s : "account"
-  end
-
-  # Extracts and permits onboarding parameters from the request.
-  def submitted_attributes
-    params.permit(
-      :name,
-      :email,
-      :address,
-      :plan_id,
-      :password,
-      :password_confirmation,
-      :step
-    ).to_h
-  end
-
-  # Merges newly submitted attributes into the draft.
-  #
-  # If the selected plan changes, discard any previously assigned
-  # asteroid and immediately assign a new one for the new plan.
-  def merge_draft(new_attributes)
-    previous_plan_id = draft["plan_id"]
-
-    draft.merge!(new_attributes)
-
-    if draft["plan_id"] != previous_plan_id
-      draft.delete("asteroid_id")
-      @selected_plan = Plan.find_by(id: draft["plan_id"])
-      @selected_asteroid = nil
-
-      choose_asteroid!
+  # Backend logic for validating account page.
+  # If I Had More Time: Email validation. Address dropdown and validation.
+  def validate_account_step
+    # Password = Password Conf
+    unless draft["password"] == draft["password_confirmation"]
+      @error = "Passwords must match."
+      return false
     end
 
-    persist_draft
-  end
-
-  # Validates account creation fields.
-  def validate_account_step
-    if params[:password] != params[:password_confirmation]
-      @error = "Passwords must match."
+    # Email has to be free
+    if User.exists?(email: draft["email"])
+      @error = "An account with this email already exists."
       return false
     end
 
     true
   end
 
-  # Ensures a plan has been selected before continuing.
+  # Backend logic for plan settings validation
+  # Gotta pick a plan!
   def validate_plan_step
-    return true if draft["plan_id"].present?
+    return true if selected_plan.present?
 
     @error = "Please select a plan first."
     false
   end
 
-  # Ensures an asteroid has been assigned before the
-  # user can complete onboarding.
+  # This will check if an asteroid is available for you before you confirm.
+  # If I Had More Time: I'd cross out plans that have no asteroids left.
   def validate_confirm_step
-    unless asteroid_for_preview
-      @error = "No asteroid available for this plan."
-      return false
+    return true if selected_asteroid.present?
+
+    @error = "No asteroid available for this plan."
+    false
+  end
+
+  # Saving the User to db.
+  def complete_onboarding
+    return false unless validate_confirm_step
+
+    # Make the model.
+    user = User.new(
+      name: draft["name"],
+      email: draft["email"],
+      address: draft["address"],
+      password: draft["password"],
+      password_confirmation: draft["password_confirmation"],
+      plan: selected_plan,
+      plan_start_date: Date.current,
+      upcoming_asteroid: selected_asteroid
+    )
+
+    # Save it to DB. And, make the asteroid owned.
+    # Password is saved as password_digest in DB. Hashed.
+    ActiveRecord::Base.transaction do
+      user.save!
+      selected_asteroid.update!(user: user)
     end
 
+    # Set our saved asteroid so the confirm view can show it
+    @saved_asteroid = selected_asteroid
+    @finished = true
+    session.delete(:onboarding)
+
     true
+  rescue ActiveRecord::RecordInvalid => error
+    @error = error.record.errors.full_messages.to_sentence
+    false
   end
 end

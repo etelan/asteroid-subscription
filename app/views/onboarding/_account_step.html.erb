@@ -1,0 +1,54 @@
+<fieldset>
+  <legend>Tell us about yourself</legend>
+
+  <div class="form-field">
+    <%= form.label :name, "Your name" %>
+    <%= form.text_field :name,
+                        value: wizard.name,
+                        placeholder: "Alex Morgan",
+                        autocomplete: "name",
+                        required: true,
+                        autofocus: true %>
+    <small>Example: Alex Morgan</small>
+  </div>
+
+  <div class="form-field">
+    <%= form.label :email, "Email address" %>
+    <%= form.email_field :email,
+                         value: wizard.email,
+                         placeholder: "alex@example.com",
+                         autocomplete: "email",
+                         required: true %>
+    <small>Example: alex@example.com</small>
+  </div>
+
+  <div class="form-field">
+    <%= form.label :address, "Shipping address" %>
+    <%= form.text_area :address,
+                       value: wizard.address,
+                       placeholder: "123 Example Street&#10;London SW1A 1AA",
+                       autocomplete: "shipping street-address",
+                       rows: 2,
+                       required: true %>
+    <small>Example: 123 Example Street, London SW1A 1AA</small>
+  </div>
+
+  <div class="form-field">
+    <%= form.label :password, "Password" %>
+    <%= form.password_field :password,
+                            minlength: 8,
+                            required: true,
+                            autocomplete: "new-password" %>
+  </div>
+
+  <div class="form-field">
+    <%= form.label :password_confirmation, "Confirm password" %>
+    <%= form.password_field :password_confirmation,
+                            minlength: 8,
+                            required: true,
+                            autocomplete: "new-password" %>
+    <p class="field-hint">Password must be at least 8 characters.</p>
+  </div>
+</fieldset>
+
+<%= form.submit "Continue to plans" %>

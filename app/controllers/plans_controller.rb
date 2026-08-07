@@ -1,3 +1,4 @@
+# (GET) All this controller does it show one the page of a specific plan by id
 class PlansController < ApplicationController
   def show
     @plan = Plan.find(params[:id])

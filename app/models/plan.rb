@@ -1,6 +1,11 @@
 class Plan < ApplicationRecord
   has_many :users
 
+  # TLDR
+  # Do we have a name?
+  # Do we have a price (not negative)?
+  # Do we have min and max diameter (not negative)?
+  # Is Min smaller than Max?
   validates :name, presence: true, uniqueness: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :min_diameter, :max_diameter, presence: true, numericality: { greater_than_or_equal_to: 0 }

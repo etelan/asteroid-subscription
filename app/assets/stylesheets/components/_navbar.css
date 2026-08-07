@@ -1,3 +1,4 @@
+/* Split out css for navbar partial component */
 .site-header nav {
   display: flex;
   gap: 24px;
