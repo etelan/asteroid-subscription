@@ -37,6 +37,7 @@
           <th>Email</th>
           <th>Address</th>
           <th>Plan</th>
+          <th>Onboarding step</th>
           <th>Plan start</th>
           <th>Upcoming asteroid</th>
           <th>User id</th>
@@ -56,6 +57,7 @@
                 <%= link_to user.plan.name, plan_path(user.plan) %>
               <% end %>
             </td>
+            <td><%= user.onboarding_step.presence || "n/a" %></td>
             <td><%= user.plan_start_date %></td>
             <td>
               <% if user.upcoming_asteroid %>

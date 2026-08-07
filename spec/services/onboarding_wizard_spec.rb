@@ -54,6 +54,16 @@ RSpec.describe OnboardingWizard do
       plan = create(:plan, min_diameter: 0.5, max_diameter: 1)
       asteroid = create(:asteroid, diameter: 0.75)
 
+      account_step = build_wizard(
+        "account",
+        name: "Alex",
+        email: "alex@example.com",
+        address: "123 Street",
+        password: "password123",
+        password_confirmation: "password123"
+      )
+      expect(account_step.submit).to be true
+
       onboarding = build_wizard("plan", plan_id: plan.id)
 
       expect(onboarding.submit).to be true

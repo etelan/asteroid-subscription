@@ -24,6 +24,32 @@ RSpec.describe "Admin", type: :request do
     expect(response).to redirect_to(admin_dashboard_path)
   end
 
+  it "shows each user's onboarding step on the dashboard" do
+    admin = create(
+      :user,
+      email: "admin@example.com",
+      password: "password123",
+      password_confirmation: "password123",
+      is_admin: true
+    )
+    create(
+      :user,
+      email: "user@example.com",
+      password: "password123",
+      password_confirmation: "password123",
+      onboarding_step: "plan"
+    )
+
+    post admin_authenticate_path, params: {
+      email: admin.email,
+      password: "password123"
+    }
+    get admin_dashboard_path
+
+    expect(response.body).to include("Onboarding step")
+    expect(response.body).to include("plan")
+  end
+
   it "stays on the login page when the password is wrong" do
     create(
       :user,

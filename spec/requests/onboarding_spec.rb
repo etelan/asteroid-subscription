@@ -13,6 +13,23 @@ RSpec.describe "Onboarding", type: :request do
     expect(response).to redirect_to(onboarding_path(step: "plan"))
   end
 
+  it "stores the onboarding step on the user as onboarding progresses" do
+    plan = create(:plan, min_diameter: 0.5, max_diameter: 1)
+    create(:asteroid, diameter: 0.75)
+
+    patch onboarding_path(step: "account"), params: valid_account_params
+    user = User.order(:id).last
+    expect(user.onboarding_step).to eq("account")
+
+    patch onboarding_path(step: "plan"), params: { plan_id: plan.id }
+    expect(user.reload.onboarding_step).to eq("plan")
+
+    patch onboarding_path(step: "confirm"), params: {}
+
+    expect(response).to have_http_status(:ok)
+    expect(user.reload.onboarding_step).to eq("confirm")
+  end
+
   it "shows validation errors in account step" do
     patch onboarding_path(step: "account"), params: {
       password: "password123",
